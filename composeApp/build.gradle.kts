@@ -132,3 +132,7 @@ compose.desktop {
 room {
     schemaDirectory("$projectDir/schemas")
 }
+
+dependencies {
+    ksp(libs.room.compiler)
+}

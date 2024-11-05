@@ -20,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import components.CustomTextField
 import composetaskapp.composeapp.generated.resources.Res
+import composetaskapp.composeapp.generated.resources.enter_email
+import composetaskapp.composeapp.generated.resources.enter_password
 import composetaskapp.composeapp.generated.resources.login
 import org.jetbrains.compose.resources.stringResource
 import theme.ButtonHeight
@@ -30,6 +32,7 @@ import theme.SmallSpacing
 
 @Composable
 fun LoginScreen(
+    uiState : LoginUiState,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onLoginButtonClicked: () -> Unit
@@ -72,18 +75,18 @@ fun LoginScreen(
         )
 
         CustomTextField(
-            value = "email",
+            value = uiState.email,
             onValueChange = onEmailChange,
             keyboardType = KeyboardType.Email,
-            hint = "Email"
+            hint = stringResource(Res.string.enter_email)
         )
 
         CustomTextField(
-            value = "password",
+            value = uiState.password,
             onValueChange = onPasswordChange,
             keyboardType = KeyboardType.Password,
             isPasswordTextField = true,
-            hint = "Password"
+            hint = stringResource(Res.string.enter_password)
         )
 
         Button(

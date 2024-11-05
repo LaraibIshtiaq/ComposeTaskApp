@@ -1,15 +1,19 @@
 package home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,11 +24,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import composetaskapp.composeapp.generated.resources.Res
 import composetaskapp.composeapp.generated.resources.add_task
+import composetaskapp.composeapp.generated.resources.no_tasks
+import database.TaskDao
 import kotlinx.coroutines.launch
+import model.Task
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun HomePage(){
+fun HomePage(taskDao: TaskDao){
     var showContent by remember { mutableStateOf(false) }
     Column(
         Modifier.fillMaxWidth(),
@@ -34,25 +41,25 @@ fun HomePage(){
             .fillMaxSize()
             .background(color = MaterialTheme.colors.background)
             .padding(20.dp)) {
-            BodyContent()
+            BodyContent(taskDao = taskDao)
         }
     }
 }
 
 
 @Composable
-fun BodyContent() {
+fun BodyContent(taskDao: TaskDao) {
     var shouldShowDialog = remember { mutableStateOf(false) } // 1
     val coroutineScope = rememberCoroutineScope() // Remember the coroutine scope
 
-//    val tasks by taskDao.getAllTasks().collectAsState(initial = emptyList())
+    val tasks by taskDao.getAllTasks().collectAsState(initial = emptyList())
 
 
     if (shouldShowDialog.value) {
         AddNewTask(shouldShowDialog = shouldShowDialog,
             { taskName, taskDescription ->
                 coroutineScope.launch {
-//                    taskDao.upsertTask(Task(0,taskName, taskDescription))
+                    taskDao.upsertTask(Task(0,taskName, taskDescription))
                 }
             },
             stringResource(Res.string.add_task)
@@ -68,45 +75,45 @@ fun BodyContent() {
         Text(stringResource(Res.string.add_task),
             style = MaterialTheme.typography.button)
     }
-//
-//    if(tasks.isEmpty())
-//    ///If tasks list is empty then show No Tasks present
-//        Box(
-//            modifier = Modifier
-//                .fillMaxSize(),
-//            contentAlignment = Alignment.Center
-//        ) {
-//            Text(stringResource(Res.string.no_tasks), style = MaterialTheme.typography.h3)
-//        }
-//    ///Else, Show Tasks in column
-//    else
-//        LazyColumn(modifier = Modifier
-//            .padding(0.dp, 60.dp, 0.dp, 0.dp),
-//            verticalArrangement = Arrangement.spacedBy(10.dp)
-//        ) {
-//            items(tasks) {task ->
-//                ListItem(
-//                    tasks.indexOf(task) + 1,
-//                    task.title,
-//                    task.description,
-//                    contentDescription = task.description,
-//                    //On Edit
-//                    {name, description ->
-//                        coroutineScope.launch {
-//                            taskDao.upsertTask(Task(task.id, name, description ))
-//                        }
-//                    },
-//                    //On Delete
-//                    {
-//                        coroutineScope.launch {
-//                            taskDao.deleteTask(task)
-//                        }
-//                    },
-//                    //On Detail View
-//                    {
-//
-//                    }
-//                )
-//            }
-//        }
+
+    if(tasks.isEmpty())
+    ///If tasks list is empty then show No Tasks present
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(stringResource(Res.string.no_tasks), style = MaterialTheme.typography.h3)
+        }
+    ///Else, Show Tasks in column
+    else
+        LazyColumn(modifier = Modifier
+            .padding(0.dp, 60.dp, 0.dp, 0.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            items(tasks) {task ->
+                ListItem(
+                    tasks.indexOf(task) + 1,
+                    task.title,
+                    task.description,
+                    contentDescription = task.description,
+                    //On Edit
+                    {name, description ->
+                        coroutineScope.launch {
+                            taskDao.upsertTask(Task(task.id, name, description ))
+                        }
+                    },
+                    //On Delete
+                    {
+                        coroutineScope.launch {
+                            taskDao.deleteTask(task)
+                        }
+                    },
+                    //On Detail View
+                    {
+
+                    }
+                )
+            }
+        }
 }
