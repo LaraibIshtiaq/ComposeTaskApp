@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.room)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -42,6 +43,7 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
 
+            //Dependency for only JVM based platforms http requests with KTOR
             implementation(libs.ktor.client.okhttp)
         }
         commonMain.dependencies {
@@ -74,6 +76,7 @@ kotlin {
         }
 
         nativeMain.dependencies {
+            //Dependency for only iOS macOS based platforms http requests with KTOR
             implementation(libs.ktor.client.darwin)
         }
 
@@ -81,6 +84,7 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
 
+            //Dependency for only JVM based platforms http requests with KTOR
             implementation(libs.ktor.client.okhttp)
         }
     }
