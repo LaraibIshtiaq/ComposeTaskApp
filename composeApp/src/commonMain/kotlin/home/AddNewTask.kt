@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -21,7 +20,6 @@ import composetaskapp.composeapp.generated.resources.Res
 import composetaskapp.composeapp.generated.resources.add_task
 import composetaskapp.composeapp.generated.resources.cancel
 import composetaskapp.composeapp.generated.resources.enter_description_here
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -35,7 +33,6 @@ fun AddNewTask(
     val taskDescription = remember { mutableStateOf("") }
     val descriptionHint = stringResource(Res.string.enter_description_here)
     val textLength = remember { mutableStateOf(0) }
-    val coroutineScope = rememberCoroutineScope() // Remember the coroutine scope
 
     if(shouldShowDialog.value){
         AlertDialog(
@@ -91,11 +88,8 @@ fun AddNewTask(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        coroutineScope.launch {
-                            // Calling suspend function inside coroutine
-                            onConfirmation(taskName.value, taskDescription.value)
-                            shouldShowDialog.value = false
-                        }
+                       onConfirmation(taskName.value, taskDescription.value)
+                        shouldShowDialog.value = false
                     }
                 ) {
                     Text(stringResource(Res.string.add_task))

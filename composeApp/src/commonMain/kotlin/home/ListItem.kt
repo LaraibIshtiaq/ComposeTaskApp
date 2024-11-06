@@ -20,7 +20,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import composetaskapp.composeapp.generated.resources.Res
 import composetaskapp.composeapp.generated.resources.ic_delete
 import composetaskapp.composeapp.generated.resources.ic_edit
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -36,12 +34,10 @@ import org.jetbrains.compose.resources.painterResource
 fun ListItem(itemNumber: Int,
                 taskTitle: String,
                 taskDescription: String,
-                contentDescription: String,
                 onEdit: (value: String, value1: String) -> Unit,
                 onDelete: () -> Unit,
                 onDetailView: () -> Unit){
 
-    val coroutineScope = rememberCoroutineScope() // Remember the coroutine scope
     var shouldShowUpdateDialog = remember { mutableStateOf(false) }
 
     if (shouldShowUpdateDialog.value) {
@@ -49,10 +45,7 @@ fun ListItem(itemNumber: Int,
             taskTitle,
             taskDescription,
             shouldShowDialog = shouldShowUpdateDialog,
-            { name, description ->
-                coroutineScope.launch {
-                    onEdit(name, description)
-                }
+            { name, description -> onEdit(name, description)
             },
             "Update Task"
         )
@@ -115,9 +108,7 @@ fun ListItem(itemNumber: Int,
                     modifier = Modifier
                         .size(24.dp) // Set a responsive size
                         .clickable {
-                            coroutineScope.launch {
-                                onDelete()
-                            }
+                            onDelete()
                         },
                     tint = MaterialTheme.colors.onSurface
                 )

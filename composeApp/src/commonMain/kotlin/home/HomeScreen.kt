@@ -15,24 +15,17 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import composetaskapp.composeapp.generated.resources.Res
 import composetaskapp.composeapp.generated.resources.add_task
 import composetaskapp.composeapp.generated.resources.no_tasks
-import database.TaskDao
-import kotlinx.coroutines.launch
 import model.Task
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun HomePage(taskDao: TaskDao){
-    var showContent by remember { mutableStateOf(false) }
+fun HomePage(homeViewModel: HomeViewModel){
     Column(
         Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.End) {
@@ -41,26 +34,21 @@ fun HomePage(taskDao: TaskDao){
             .fillMaxSize()
             .background(color = MaterialTheme.colors.background)
             .padding(20.dp)) {
-            BodyContent(taskDao = taskDao)
+            BodyContent(homeViewModel= homeViewModel)
         }
     }
 }
 
 
 @Composable
-fun BodyContent(taskDao: TaskDao) {
-    var shouldShowDialog = remember { mutableStateOf(false) } // 1
-    val coroutineScope = rememberCoroutineScope() // Remember the coroutine scope
-
-    val tasks by taskDao.getAllTasks().collectAsState(initial = emptyList())
+fun BodyContent(homeViewModel: HomeViewModel) {
+    val tasks by homeViewModel.tasks.collectAsState(initial = emptyList())
 
 
-    if (shouldShowDialog.value) {
-        AddNewTask(shouldShowDialog = shouldShowDialog,
+    if (homeViewModel.shouldShowDialog.value) {
+        AddNewTask(shouldShowDialog = homeViewModel.shouldShowDialog,
             { taskName, taskDescription ->
-                coroutineScope.launch {
-                    taskDao.upsertTask(Task(0,taskName, taskDescription))
-                }
+                homeViewModel.upsertTask(Task(0,taskName, taskDescription))
             },
             stringResource(Res.string.add_task)
         )
@@ -69,7 +57,7 @@ fun BodyContent(taskDao: TaskDao) {
     //Add tasks Button
     Button(
         onClick = {
-            shouldShowDialog.value = true
+            homeViewModel.showAddTaskDialog()
         },
     ) {
         Text(stringResource(Res.string.add_task),
@@ -83,7 +71,7 @@ fun BodyContent(taskDao: TaskDao) {
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text(stringResource(Res.string.no_tasks), style = MaterialTheme.typography.h3)
+            Text(stringResource(Res.string.no_tasks), style = MaterialTheme.typography.h4)
         }
     ///Else, Show Tasks in column
     else
@@ -96,21 +84,13 @@ fun BodyContent(taskDao: TaskDao) {
                     tasks.indexOf(task) + 1,
                     task.title,
                     task.description,
-                    contentDescription = task.description,
-                    //On Edit
-                    {name, description ->
-                        coroutineScope.launch {
-                            taskDao.upsertTask(Task(task.id, name, description ))
-                        }
+                    onEdit = { name, description ->
+                        homeViewModel.upsertTask(Task(task.id, name, description ))
                     },
-                    //On Delete
-                    {
-                        coroutineScope.launch {
-                            taskDao.deleteTask(task)
-                        }
+                    onDelete = {
+                        homeViewModel.deleteTask(task)
                     },
-                    //On Detail View
-                    {
+                    onDetailView = {
 
                     }
                 )

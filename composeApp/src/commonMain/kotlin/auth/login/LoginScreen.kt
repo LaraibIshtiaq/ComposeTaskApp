@@ -5,6 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +25,7 @@ import composetaskapp.composeapp.generated.resources.Res
 import composetaskapp.composeapp.generated.resources.enter_email
 import composetaskapp.composeapp.generated.resources.enter_password
 import composetaskapp.composeapp.generated.resources.login
+import composetaskapp.composeapp.generated.resources.signup
 import org.jetbrains.compose.resources.stringResource
 import theme.ButtonHeight
 import theme.ExtraLargeSpacing
@@ -32,10 +35,9 @@ import theme.SmallSpacing
 
 @Composable
 fun LoginScreen(
-    uiState : LoginUiState,
-    onEmailChange: (String) -> Unit,
-    onPasswordChange: (String) -> Unit,
-    onLoginButtonClicked: () -> Unit
+    loginViewModel: LoginViewModel,
+    onLoginButtonClicked: () -> Unit,
+    haveNoAccount: () -> Unit
 ){
     Column(
         modifier = Modifier.fillMaxSize()
@@ -75,19 +77,37 @@ fun LoginScreen(
         )
 
         CustomTextField(
-            value = uiState.email,
-            onValueChange = onEmailChange,
+            value = loginViewModel.uiState.email,
+            onValueChange = { newValue -> loginViewModel.updateEmail(newValue) },
             keyboardType = KeyboardType.Email,
             hint = stringResource(Res.string.enter_email)
         )
 
         CustomTextField(
-            value = uiState.password,
-            onValueChange = onPasswordChange,
+            value = loginViewModel.uiState.password,
+            onValueChange = { newValue -> loginViewModel.updatePassword(newValue) },
             keyboardType = KeyboardType.Password,
             isPasswordTextField = true,
             hint = stringResource(Res.string.enter_password)
         )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "already have an account?",
+                style = MaterialTheme.typography.caption
+            )
+            TextButton(
+                onClick = haveNoAccount
+            ) {
+                Text(
+                    stringResource(Res.string.signup),
+                    style = MaterialTheme.typography.subtitle2
+                )
+            }
+        }
+
 
         Button(
             onClick = {

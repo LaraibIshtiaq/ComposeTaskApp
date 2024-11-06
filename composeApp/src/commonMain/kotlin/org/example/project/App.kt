@@ -8,11 +8,10 @@ import auth.login.LoginScreen
 import auth.login.LoginViewModel
 import auth.signup.SignUpScreen
 import auth.signup.SignUpViewModel
-import database.TaskDao
 import home.HomePage
+import home.HomeViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import theme.TaskAppTheme
@@ -23,47 +22,38 @@ import theme.TaskAppTheme
 fun App() {
     TaskAppTheme {
         KoinContext {
+
             val loginViewModel = koinViewModel<LoginViewModel>()
             val signUpViewModel = koinViewModel<SignUpViewModel>()
-            val taskDao = koinInject<TaskDao>()
-
-
+            val homeViewModel = koinViewModel<HomeViewModel>()
             val navController = rememberNavController()
 
-            NavHost(navController, startDestination = "signup") {
 
+            NavHost(navController, startDestination = "signup") {
                 composable("signup") {
                     SignUpScreen(
-                        signUpViewModel.uiState,
-                        //On Username changed
-                        {},
-                        //On Email changed
-                        {},
-                        //On Password changed
-                        {},
+                        signUpViewModel,
                         //On Signup Button Clicked
-                        {
-                            navController.navigate("login")
-                        }
+                        { navController.navigate("home") },
+                        //On Already Have An Account
+                        { navController.navigate("login") }
                     )
+
                 }
 
                 composable("login") {
                     LoginScreen(
-                        loginViewModel.uiState,
-                        //On Email changed
-                        {},
-                        //On Password changed
-                        {},
+                        loginViewModel,
                         //On Login Button Clicked
-                        {
-                            navController.navigate("home")
-                        }
+                        { navController.navigate("home") },
+
+                        //On Having No Account
+                        { navController.navigate("signup") }
                     )
                 }
 
                 composable("home") {
-                    HomePage(taskDao = taskDao)
+                    HomePage(homeViewModel)
                 }
             }
         }
