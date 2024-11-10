@@ -15,6 +15,7 @@ import model.Task
 abstract class TaskDatabase: RoomDatabase(){
 
     abstract fun taskDao(): TaskDao
+
 }
 
 

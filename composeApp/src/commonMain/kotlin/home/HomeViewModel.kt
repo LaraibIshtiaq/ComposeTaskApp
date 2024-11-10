@@ -7,9 +7,12 @@ import androidx.lifecycle.viewModelScope
 import database.TaskDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import model.Priority
 import model.Task
 
 class HomeViewModel(private val taskDao: TaskDao): ViewModel() {
+
+    val priorities: List<Priority> = Priority.entries
 
     // Holds the visibility state of the dialog
     private val _shouldShowDialog = mutableStateOf(false)

@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.room)
+//    alias(libs.plugins.room)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
 }
@@ -16,7 +16,7 @@ kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_22)
         }
     }
     
@@ -32,7 +32,7 @@ kotlin {
     }
     
     jvm("desktop")
-    
+
     sourceSets {
         val desktopMain by getting
         
@@ -81,7 +81,8 @@ kotlin {
         }
 
         desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
+            //implementation(compose.desktop.currentOs)
+            implementation(compose.desktop.macos_arm64)
             implementation(libs.kotlinx.coroutines.swing)
 
             //Dependency for only JVM based platforms http requests with KTOR
@@ -112,8 +113,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_22
+        targetCompatibility = JavaVersion.VERSION_22
     }
 }
 
@@ -133,10 +134,21 @@ compose.desktop {
     }
 }
 
-room {
-    schemaDirectory("$projectDir/schemas")
+//room {
+//    schemaDirectory("$projectDir/schemas")
+//}
+ksp {
+    arg("room.schemaLocation", "${projectDir}/schemas")
 }
 
 dependencies {
-    ksp(libs.room.compiler)
+//    ksp(libs.room.compiler)
+    // Android
+    add("kspAndroid", libs.room.compiler)
+    // JVM (Desktop)
+    add("kspDesktop", libs.room.compiler)
+    // iOS
+    add("kspIosSimulatorArm64", libs.room.compiler)
+    add("kspIosX64", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
 }

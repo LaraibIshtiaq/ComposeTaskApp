@@ -10,7 +10,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -20,28 +19,32 @@ import composetaskapp.composeapp.generated.resources.Res
 import composetaskapp.composeapp.generated.resources.add_task
 import composetaskapp.composeapp.generated.resources.cancel
 import composetaskapp.composeapp.generated.resources.enter_description_here
+import model.Priority
+import model.Task
 import org.jetbrains.compose.resources.stringResource
+import theme.SmallSpacing
 
 @Composable
 fun AddNewTask(
-    shouldShowDialog: MutableState<Boolean>,
-    onConfirmation: (value: String, value1: String) -> Unit,
-    dialogTitle: String,
+    homeViewModel: HomeViewModel,
 ) {
     val taskName = remember { mutableStateOf("") }
     val titleHint = stringResource(Res.string.add_task)
     val taskDescription = remember { mutableStateOf("") }
     val descriptionHint = stringResource(Res.string.enter_description_here)
+    val taskPriority = remember { mutableStateOf(Priority.Low) }
     val textLength = remember { mutableStateOf(0) }
 
-    if(shouldShowDialog.value){
+    if(homeViewModel.shouldShowDialog.value){
         AlertDialog(
             title = {
-                Text(text = dialogTitle)
+                Text(text =  stringResource(Res.string.add_task))
             },
 
             text = {
                 Column(
+                    modifier = Modifier
+                        .padding(0.dp, SmallSpacing),
                     verticalArrangement = Arrangement.Center
                 ) {
                     TextField(
@@ -77,28 +80,36 @@ fun AddNewTask(
                             .sizeIn(minHeight = 120.dp)
                             .background(Color.Transparent)
                     )
+
+                    CustomPriorityDropDown(homeViewModel, taskPriority)
                 }
 
             },
 
-
             onDismissRequest = {
-                shouldShowDialog.value = false
+                homeViewModel.shouldShowDialog.value = false
             },
+
             confirmButton = {
                 TextButton(
                     onClick = {
-                       onConfirmation(taskName.value, taskDescription.value)
-                        shouldShowDialog.value = false
-                    }
-                ) {
+                        homeViewModel.upsertTask(
+                            Task(
+                                0,
+                                taskName.value,
+                                taskDescription.value,
+                                taskPriority.value))
+                        homeViewModel.shouldShowDialog.value = false
+                              },
+                    ) {
                     Text(stringResource(Res.string.add_task))
                 }
             },
+
             dismissButton = {
                 TextButton(
                     onClick = {
-                        shouldShowDialog.value = false
+                        homeViewModel.shouldShowDialog.value = false
                     }
                 ) {
                     Text(text = stringResource(Res.string.cancel))

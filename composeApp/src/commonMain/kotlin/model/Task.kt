@@ -7,5 +7,11 @@ import androidx.room.PrimaryKey
 data class Task(
     @PrimaryKey(autoGenerate = true) val id : Int,
     val title: String,
-    val description: String
+    val description: String,
+    val priority: Priority
 )
+
+//enum to represent priorities
+enum class Priority {
+    Low, Medium, High, Vital
+}

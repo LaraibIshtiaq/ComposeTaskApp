@@ -13,38 +13,41 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import composetaskapp.composeapp.generated.resources.Res
+import composetaskapp.composeapp.generated.resources.cancel
+import composetaskapp.composeapp.generated.resources.enter_description_here
+import composetaskapp.composeapp.generated.resources.enter_task_title_here
 import composetaskapp.composeapp.generated.resources.update_task
-import kotlinx.coroutines.launch
+import model.Task
 import org.jetbrains.compose.resources.stringResource
+import theme.SmallSpacing
 
 @Composable
 fun UpdateTask(
-    title: String,
-    description: String,
+    homeViewModel: HomeViewModel,
+    task: Task,
     shouldShowDialog: MutableState<Boolean>,
-    onConfirmation: (value: String, value1: String) -> Unit,
-    dialogTitle: String,
 ) {
-    val taskName = remember { mutableStateOf(title) }
-    val titleHint = "Update task title"
-    val taskDescription = remember { mutableStateOf(description) }
-    val descriptionHint = "Update task description..."
+    val taskName = remember { mutableStateOf(task.title) }
+    val titleHint = stringResource(Res.string.enter_task_title_here)
+    val taskDescription = remember { mutableStateOf(task.description) }
+    val descriptionHint = stringResource(Res.string.enter_description_here)
+    val taskPriority = remember { mutableStateOf(task.priority) }
     val textLength = remember { mutableStateOf(0) }
-    val coroutineScope = rememberCoroutineScope() // Remember the coroutine scope
 
     if(shouldShowDialog.value){
         AlertDialog(
             title = {
-                Text(text = dialogTitle)
+                Text(text = stringResource(Res.string.update_task))
             },
 
             text = {
                 Column(
+                    modifier = Modifier
+                        .padding(0.dp, SmallSpacing),
                     verticalArrangement = Arrangement.Center
                 ) {
                     TextField(
@@ -80,6 +83,9 @@ fun UpdateTask(
                             .sizeIn(minHeight = 120.dp)
                             .background(Color.Transparent)
                     )
+
+                    CustomPriorityDropDown(homeViewModel, taskPriority)
+
                 }
 
             },
@@ -91,11 +97,8 @@ fun UpdateTask(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        coroutineScope.launch {
-                            // Calling suspend function inside coroutine
-                            onConfirmation(taskName.value, taskDescription.value)
-                            shouldShowDialog.value = false
-                        }
+                        homeViewModel.upsertTask(Task(task.id, taskName.value, taskDescription.value, taskPriority.value))
+                        shouldShowDialog.value = false
                     }
                 ) {
                     Text(text= stringResource(Res.string.update_task))
@@ -107,7 +110,7 @@ fun UpdateTask(
                         shouldShowDialog.value = false
                     }
                 ) {
-                    Text(text = "Cancel")
+                    Text(text = stringResource(Res.string.cancel))
                 }
             }
         )

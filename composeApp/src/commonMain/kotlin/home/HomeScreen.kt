@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import composetaskapp.composeapp.generated.resources.Res
 import composetaskapp.composeapp.generated.resources.add_task
 import composetaskapp.composeapp.generated.resources.no_tasks
-import model.Task
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -46,11 +45,8 @@ fun BodyContent(homeViewModel: HomeViewModel) {
 
 
     if (homeViewModel.shouldShowDialog.value) {
-        AddNewTask(shouldShowDialog = homeViewModel.shouldShowDialog,
-            { taskName, taskDescription ->
-                homeViewModel.upsertTask(Task(0,taskName, taskDescription))
-            },
-            stringResource(Res.string.add_task)
+        AddNewTask(
+            homeViewModel,
         )
     }
 
@@ -81,15 +77,9 @@ fun BodyContent(homeViewModel: HomeViewModel) {
         ) {
             items(tasks) {task ->
                 ListItem(
+                    homeViewModel,
                     tasks.indexOf(task) + 1,
-                    task.title,
-                    task.description,
-                    onEdit = { name, description ->
-                        homeViewModel.upsertTask(Task(task.id, name, description ))
-                    },
-                    onDelete = {
-                        homeViewModel.deleteTask(task)
-                    },
+                    task,
                     onDetailView = {
 
                     }

@@ -9,6 +9,7 @@
     <string name="no_tasks">No Tasks</string>
     <string name="enter_description_here">Enter description here</string>
     <string name="enter_task_title_here">Enter task title here</string>
+    <string name="enter_task_priority_here">Enter task priority here</string>
     <string name="enter_user_name">Enter user name</string>
     <string name="enter_email">Enter email</string>
     <string name="enter_password">Enter password</string>

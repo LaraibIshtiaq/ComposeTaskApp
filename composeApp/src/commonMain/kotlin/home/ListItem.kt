@@ -27,27 +27,24 @@ import androidx.compose.ui.unit.dp
 import composetaskapp.composeapp.generated.resources.Res
 import composetaskapp.composeapp.generated.resources.ic_delete
 import composetaskapp.composeapp.generated.resources.ic_edit
+import model.Task
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ListItem(itemNumber: Int,
-                taskTitle: String,
-                taskDescription: String,
-                onEdit: (value: String, value1: String) -> Unit,
-                onDelete: () -> Unit,
-                onDetailView: () -> Unit){
+fun ListItem(
+    homeViewModel: HomeViewModel,
+    itemNumber: Int,
+    task: Task,
+    onDetailView: () -> Unit){
 
     var shouldShowUpdateDialog = remember { mutableStateOf(false) }
 
     if (shouldShowUpdateDialog.value) {
         UpdateTask(
-            taskTitle,
-            taskDescription,
+            homeViewModel,
+            task,
             shouldShowDialog = shouldShowUpdateDialog,
-            { name, description -> onEdit(name, description)
-            },
-            "Update Task"
         )
     }
 
@@ -59,72 +56,91 @@ fun ListItem(itemNumber: Int,
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp), // Added padding for a better responsive look
+                .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
                 modifier = Modifier
-                    .weight(1f) // Allow column to take up available space
-                    .padding(end = 16.dp) // Added padding between text and icons for better spacing
+                    .weight(1f)
+                    .padding(end = 16.dp)
             ) {
                 Text(
-                    "$itemNumber $taskTitle",
+                    "$itemNumber ${task.title}",
                     style = MaterialTheme.typography.body1,
                     color = if (isSystemInDarkTheme()) {
                         MaterialTheme.colors.onSurface
                     } else {
                         MaterialTheme.colors.onBackground
                     },
-                    maxLines = 1, // Limit to one line to handle overflow
-                    overflow = TextOverflow.Ellipsis // Use ellipsis if text is too long
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
 
                 Spacer(
                     modifier = Modifier
-                        .height(8.dp) // Adjusted spacing for better responsiveness
+                        .height(8.dp)
                 )
 
                 Text(
-                    taskDescription,
+                    task.description,
                     style = MaterialTheme.typography.body2,
                     color = if (isSystemInDarkTheme()) {
                         MaterialTheme.colors.onSurface
                     } else {
                         MaterialTheme.colors.onBackground
                     },
-                    maxLines = 2, // Limit to two lines for better responsiveness
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
             }
 
-            Row(
-                modifier = Modifier
-                    .wrapContentWidth() // Make row wrap its content width
-            ) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_delete),
-                    contentDescription = "Delete icon",
-                    modifier = Modifier
-                        .size(24.dp) // Set a responsive size
-                        .clickable {
-                            onDelete()
-                        },
-                    tint = MaterialTheme.colors.onSurface
+            Column {
+                Text(
+                    "${task.priority}",
+                    style = MaterialTheme.typography.body1,
+                    color = if (isSystemInDarkTheme()) {
+                        MaterialTheme.colors.onSurface
+                    } else {
+                        MaterialTheme.colors.onBackground
+                    },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.width(16.dp)) // Spacing between icons
-
-                Icon(
-                    painter = painterResource(Res.drawable.ic_edit),
-                    contentDescription = "Edit icon",
+                Spacer(
                     modifier = Modifier
-                        .size(24.dp) // Set a responsive size
-                        .clickable {
-                            shouldShowUpdateDialog.value = true
-                        },
-                    tint = MaterialTheme.colors.onSurface
+                        .height(8.dp)
                 )
+
+                Row(
+                    modifier = Modifier
+                        .wrapContentWidth()
+                ) {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_delete),
+                        contentDescription = "Delete icon",
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable {
+                                homeViewModel.deleteTask(task)
+                            },
+                        tint = MaterialTheme.colors.onSurface
+                    )
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_edit),
+                        contentDescription = "Edit icon",
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable {
+                                shouldShowUpdateDialog.value = true
+                            },
+                        tint = MaterialTheme.colors.onSurface
+                    )
+                }
             }
         }
     }
