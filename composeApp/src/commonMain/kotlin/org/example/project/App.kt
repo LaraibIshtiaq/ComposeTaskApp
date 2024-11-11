@@ -1,6 +1,12 @@
 package org.example.project
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -10,6 +16,7 @@ import auth.signup.SignUpScreen
 import auth.signup.SignUpViewModel
 import home.HomePage
 import home.HomeViewModel
+import navigation.NavRoutes
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
@@ -30,30 +37,32 @@ fun App() {
 
 
             NavHost(navController, startDestination = "signup") {
-                composable("signup") {
+                composable(NavRoutes.Signup.route) {
                     SignUpScreen(
+                        navController,
                         signUpViewModel,
-                        //On Signup Button Clicked
-                        { navController.navigate("home") },
-                        //On Already Have An Account
-                        { navController.navigate("login") }
                     )
-
                 }
 
-                composable("login") {
+                composable(NavRoutes.Login.route) {
                     LoginScreen(
+                        navController,
                         loginViewModel,
-                        //On Login Button Clicked
-                        { navController.navigate("home") },
-
-                        //On Having No Account
-                        { navController.navigate("signup") }
                     )
                 }
 
-                composable("home") {
+                composable(NavRoutes.Home.route) {
                     HomePage(homeViewModel)
+                }
+
+                composable(NavRoutes.Loading.route){
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator()
+                        Text("Loading...")
+                    }
                 }
             }
         }

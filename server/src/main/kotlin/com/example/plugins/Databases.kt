@@ -1,5 +1,6 @@
 package com.example.plugins
 
+import com.example.db.tables.UserTable
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -7,6 +8,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.*
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.TransactionManager
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.sql.*
 
 fun Application.configureDatabases() {
@@ -21,6 +24,14 @@ fun Application.configureDatabases() {
         user = "postgres",
         password = "password"
     )
+    //To create a table named "users" if not already exists
+    transaction {
+        SchemaUtils.create(UserTable)
+    }
+
+    TransactionManager.manager.defaultIsolationLevel =
+        java.sql.Connection.TRANSACTION_SERIALIZABLE
+
 }
 
 /**

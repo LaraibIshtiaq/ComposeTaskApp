@@ -10,12 +10,17 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
+
+// Defines the TaskTable schema for tasks in the database, inheriting from IntIdTable with "task"
+// as the table name.
 object TaskTable : IntIdTable("task") {
     val name = varchar("name", 50)
     val description = varchar("description", 50)
     val priority = varchar("priority", 50)
 }
 
+
+// Data Access Object (DAO) class for the Task entity, representing a row in TaskTable.
 class TaskDAO(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<TaskDAO>(TaskTable)
 
@@ -29,7 +34,8 @@ class TaskDAO(id: EntityID<Int>) : IntEntity(id) {
 suspend fun <T> suspendTransaction(block: Transaction.() -> T): T =
     newSuspendedTransaction(Dispatchers.IO, statement = block)
 
-//This function transforms an instance of the TaskDAO type to the Task object.
+// Converts a TaskDAO instance to a Task model object.
+// Maps the DAO properties to the Task data class, converting the priority to a Priority enum.
 fun daoToModel(dao: TaskDAO) = Task(
     dao.name,
     dao.description,

@@ -21,7 +21,7 @@ import composetaskapp.composeapp.generated.resources.cancel
 import composetaskapp.composeapp.generated.resources.enter_description_here
 import composetaskapp.composeapp.generated.resources.enter_task_title_here
 import composetaskapp.composeapp.generated.resources.update_task
-import model.Task
+import data.model.Task
 import org.jetbrains.compose.resources.stringResource
 import theme.SmallSpacing
 

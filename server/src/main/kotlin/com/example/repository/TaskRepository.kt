@@ -1,4 +1,7 @@
-package com.example.model
+package com.example.repository
+
+import com.example.model.Priority
+import com.example.model.Task
 
 
 interface TaskRepository {

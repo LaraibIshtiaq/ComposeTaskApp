@@ -19,8 +19,8 @@ import composetaskapp.composeapp.generated.resources.Res
 import composetaskapp.composeapp.generated.resources.add_task
 import composetaskapp.composeapp.generated.resources.cancel
 import composetaskapp.composeapp.generated.resources.enter_description_here
-import model.Priority
-import model.Task
+import data.model.Priority
+import data.model.Task
 import org.jetbrains.compose.resources.stringResource
 import theme.SmallSpacing
 
@@ -98,7 +98,8 @@ fun AddNewTask(
                                 0,
                                 taskName.value,
                                 taskDescription.value,
-                                taskPriority.value))
+                                taskPriority.value)
+                        )
                         homeViewModel.shouldShowDialog.value = false
                               },
                     ) {

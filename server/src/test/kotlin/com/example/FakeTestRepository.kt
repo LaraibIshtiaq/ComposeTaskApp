@@ -2,7 +2,7 @@ package com.example
 
 import com.example.model.Priority
 import com.example.model.Task
-import com.example.model.TaskRepository
+import com.example.repository.TaskRepository
 
 //This is a fake testing repository which is used to test only.
 class FakeTestRepository : TaskRepository {

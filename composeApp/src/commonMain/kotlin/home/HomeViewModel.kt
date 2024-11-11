@@ -7,8 +7,8 @@ import androidx.lifecycle.viewModelScope
 import database.TaskDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import model.Priority
-import model.Task
+import data.model.Priority
+import data.model.Task
 
 class HomeViewModel(private val taskDao: TaskDao): ViewModel() {
 

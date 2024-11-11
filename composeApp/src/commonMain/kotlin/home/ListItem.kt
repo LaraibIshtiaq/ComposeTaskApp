@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import composetaskapp.composeapp.generated.resources.Res
 import composetaskapp.composeapp.generated.resources.ic_delete
 import composetaskapp.composeapp.generated.resources.ic_edit
-import model.Task
+import data.model.Task
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterialApi::class)

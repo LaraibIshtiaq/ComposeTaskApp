@@ -21,7 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import composetaskapp.composeapp.generated.resources.Res
 import composetaskapp.composeapp.generated.resources.ic_drop_down
-import model.Priority
+import data.model.Priority
 import org.jetbrains.compose.resources.painterResource
 import theme.ExtraLargeSpacing
 

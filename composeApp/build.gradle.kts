@@ -66,6 +66,7 @@ kotlin {
 
             //Dependencies for ktor
             implementation(libs.bundles.ktor)
+            implementation(libs.ktor.client.cio)
 
             //Dependencies for room db
             implementation(libs.room.runtime)
