@@ -79,6 +79,38 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(MediumSpacing)
         ){
+
+            Text(
+                stringResource(Res.string.login),
+                style = MaterialTheme.typography.h4,
+                color = if(isSystemInDarkTheme()){
+                    MaterialTheme.colors.onSurface
+                }
+                else{
+                    MaterialTheme.colors.onBackground
+                }
+            )
+
+            Box(
+                modifier = Modifier
+                    .height(SmallSpacing)
+            )
+
+            CustomTextField(
+                value = email,
+                onValueChange = { newValue -> email = newValue },
+                keyboardType = KeyboardType.Email,
+                hint = stringResource(Res.string.enter_email)
+            )
+
+            CustomTextField(
+                value = password,
+                onValueChange = { newValue -> password = newValue },
+                keyboardType = KeyboardType.Password,
+                isPasswordTextField = true,
+                hint = stringResource(Res.string.enter_password)
+            )
+
             when (val registerState = state.value) {
                 LoginState.Loading -> {
                     CircularProgressIndicator()
@@ -86,7 +118,8 @@ fun LoginScreen(
                 }
 
                 is LoginState.Error -> {
-                    Text(registerState.message)
+                    Text(registerState.message,
+                        maxLines = 2)
                     Button(onClick = {
                         loginViewModel.retry()
                     }) {
@@ -105,36 +138,6 @@ fun LoginScreen(
                 }
 
                 LoginState.Nothing -> {
-                    Text(
-                        stringResource(Res.string.login),
-                        style = MaterialTheme.typography.h4,
-                        color = if(isSystemInDarkTheme()){
-                            MaterialTheme.colors.onSurface
-                        }
-                        else{
-                            MaterialTheme.colors.onBackground
-                        }
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .height(SmallSpacing)
-                    )
-
-                    CustomTextField(
-                        value = email,
-                        onValueChange = { newValue -> email = newValue },
-                        keyboardType = KeyboardType.Email,
-                        hint = stringResource(Res.string.enter_email)
-                    )
-
-                    CustomTextField(
-                        value = password,
-                        onValueChange = { newValue -> password = newValue },
-                        keyboardType = KeyboardType.Password,
-                        isPasswordTextField = true,
-                        hint = stringResource(Res.string.enter_password)
-                    )
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically

@@ -69,16 +69,16 @@ class NetworkService(val httpClient: HttpClient) {
             ResultWrapper.Success(response)
         } catch (e: ClientRequestException) {
             // Catch any client-side errors (e.g., network issues, malformed requests)
-            ResultWrapper.Error(e)  // Return an error result with the exception
+            ResultWrapper.Error(Exception("Network Issues"))  // Return an error result with the exception
         } catch (e: ServerResponseException) {
             // Catch any server-side errors (e.g., 500 or 404 errors)
-            ResultWrapper.Error(e)  // Return an error result with the exception
+            ResultWrapper.Error(Exception("Server Response Issue"))  // Return an error result with the exception
         } catch (e: IOException) {
             // Catch any I/O errors (e.g., network connectivity issues)
-            ResultWrapper.Error(e)  // Return an error result with the exception
+            ResultWrapper.Error(Exception("Network Connectivity Issue"))  // Return an error result with the exception
         } catch (e: Exception) {
             // Catch any other unexpected errors
-            ResultWrapper.Error(e)  // Return an error result with the exception
+            ResultWrapper.Error(Exception("Error"))  // Return an error result with the exception
         }
     }
 }

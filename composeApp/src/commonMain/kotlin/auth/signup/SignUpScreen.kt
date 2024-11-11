@@ -79,6 +79,44 @@ fun SignUpScreen(
             verticalArrangement = Arrangement.spacedBy(MediumSpacing)
         ){
 
+            Text(
+                stringResource(Res.string.signup),
+                style = MaterialTheme.typography.h4,
+                color = if(isSystemInDarkTheme()){
+                    MaterialTheme.colors.onSurface
+                }
+                else{
+                    MaterialTheme.colors.onBackground
+                }
+            )
+
+            Box(
+                modifier = Modifier
+                    .height(SmallSpacing)
+            )
+
+            CustomTextField(
+                value = name,
+                onValueChange = { newValue -> name = newValue },
+                keyboardType = KeyboardType.Text,
+                hint = stringResource(Res.string.enter_user_name)
+            )
+
+            CustomTextField(
+                value = email,
+                onValueChange = { newValue -> email = newValue },
+                keyboardType = KeyboardType.Email,
+                hint = stringResource(Res.string.enter_email)
+            )
+
+            CustomTextField(
+                value = password,
+                onValueChange = { newValue -> password = newValue },
+                keyboardType = KeyboardType.Password,
+                isPasswordTextField = true,
+                hint = stringResource(Res.string.enter_password)
+            )
+
             when(val signupState = state.value){
                 SignupState.Loading -> {
                     CircularProgressIndicator()
@@ -104,47 +142,7 @@ fun SignUpScreen(
                     }
                 }
 
-
                 SignupState.Nothing -> {
-
-                    Text(
-                        stringResource(Res.string.signup),
-                        style = MaterialTheme.typography.h4,
-                        color = if(isSystemInDarkTheme()){
-                            MaterialTheme.colors.onSurface
-                        }
-                        else{
-                            MaterialTheme.colors.onBackground
-                        }
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .height(SmallSpacing)
-                    )
-
-                    CustomTextField(
-                        value = name,
-                        onValueChange = { newValue -> name = newValue },
-                        keyboardType = KeyboardType.Text,
-                        hint = stringResource(Res.string.enter_user_name)
-                    )
-
-                    CustomTextField(
-                        value = email,
-                        onValueChange = { newValue -> email = newValue },
-                        keyboardType = KeyboardType.Email,
-                        hint = stringResource(Res.string.enter_email)
-                    )
-
-                    CustomTextField(
-                        value = password,
-                        onValueChange = { newValue -> password = newValue },
-                        keyboardType = KeyboardType.Password,
-                        isPasswordTextField = true,
-                        hint = stringResource(Res.string.enter_password)
-                    )
-
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically
