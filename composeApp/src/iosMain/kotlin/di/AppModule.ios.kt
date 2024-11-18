@@ -10,4 +10,9 @@ actual val platformModule = module {
 
     // Public TaskDao instance from TaskDatabase
     single { get<TaskDatabase>().taskDao() }
+
+    // Public UserDao instance from TaskDatabase
+    single {
+        get<TaskDatabase>().userDao()
+    }
 }

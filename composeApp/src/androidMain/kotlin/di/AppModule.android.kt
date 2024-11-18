@@ -8,8 +8,17 @@ import org.koin.dsl.module
 
 actual val platformModule = module {
     // Private TaskDatabase instance, not accessible outside this module
-    single { getTaskDatabase(androidContext()) } bind TaskDatabase::class
+    single {
+        getTaskDatabase(androidContext())
+    } bind TaskDatabase::class
 
     // Public TaskDao instance from TaskDatabase
-    single { get<TaskDatabase>().taskDao() }
+    single {
+        get<TaskDatabase>().taskDao()
+    }
+
+    // Public UserDao instance from TaskDatabase
+    single {
+        get<TaskDatabase>().userDao()
+    }
 }

@@ -1,5 +1,6 @@
 package di
 
+import auth.AuthRepository
 import auth.login.LoginViewModel
 import auth.signup.SignUpViewModel
 import data.NetworkService
@@ -24,6 +25,9 @@ val sharedModule = module {
         NetworkService(get())
     }
 
+    single {
+        AuthRepository(get(), get())
+    }
     single{
         HttpClient(CIO) {
             install(ContentNegotiation) {

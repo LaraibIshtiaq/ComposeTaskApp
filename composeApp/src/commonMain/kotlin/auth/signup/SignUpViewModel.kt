@@ -2,6 +2,7 @@ package auth.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import auth.AuthRepository
 import data.NetworkService
 import data.ResultWrapper
 import data.model.request.SignupRequest
@@ -10,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 // ViewModel class for handling user sign-up logic and managing UI state.
-class SignUpViewModel(val networkService: NetworkService): ViewModel() {
+class SignUpViewModel(private val authRepository: AuthRepository): ViewModel() {
 
     // Backing property for the sign-up state, initialized with Nothing as the default state.
     private val _uiState = MutableStateFlow<SignupState>(SignupState.Nothing)
@@ -23,24 +24,12 @@ class SignUpViewModel(val networkService: NetworkService): ViewModel() {
         _uiState.value = SignupState.Loading
         // Launches a coroutine in the ViewModel's scope to handle asynchronous registration.
         viewModelScope.launch {
-            // Makes a network request to register the user, passing the necessary sign-up details.
-            val response = networkService.register(
-                SignupRequest(
-                    email = email,
-                    password = password,
-                    name = name
-                )
-            )
-            // Handles the network response based on success or error.
-            when (response) {
-                // On success, sets the UI state to Success and saves the user locally.
-                is ResultWrapper.Success -> {
-                    _uiState.value = SignupState.Success
-                    saveUserLocally()
-                }
-                // On error, sets the UI state to Error with the error message.
-                is ResultWrapper.Error -> {
-                    _uiState.value = SignupState.Error(response.e.message ?: "An error occurred")
+            // Makes a request to register the user, passing the necessary sign-up details
+            authRepository.registerUser(name, email, password).collect { response ->
+                when (response) {
+                    is ResultWrapper.Success -> _uiState.value = SignupState.Success
+                    is ResultWrapper.Error -> _uiState.value =
+                        SignupState.Error(response.e.message ?: "An error occurred")
                 }
             }
         }

@@ -20,4 +20,8 @@ interface TaskDao {
     ///For getting list of tasks
     @Query("SELECT * FROM task")
     fun getAllTasks(): Flow<List<Task>>
+
+    @Query("SELECT * FROM task WHERE userId = :userId")
+    fun getTasksByUser(userId: Int): Flow<List<Task>>
+
 }

@@ -19,7 +19,7 @@ class HomeViewModel(private val taskDao: TaskDao): ViewModel() {
     val shouldShowDialog: MutableState<Boolean> get() = _shouldShowDialog
 
     // Holds the tasks state from the database
-    val tasks: Flow<List<Task>> = taskDao.getAllTasks()
+    val tasks: Flow<List<Task>> = taskDao.getTasksByUser(1)
 
     //Show dialog for adding tasks
     fun showAddTaskDialog() {
