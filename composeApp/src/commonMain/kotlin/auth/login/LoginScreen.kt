@@ -35,6 +35,7 @@ import composetaskapp.composeapp.generated.resources.enter_email
 import composetaskapp.composeapp.generated.resources.enter_password
 import composetaskapp.composeapp.generated.resources.login
 import composetaskapp.composeapp.generated.resources.signup
+import home.HomeViewModel
 import io.ktor.websocket.Frame
 import navigation.NavRoutes
 import org.jetbrains.compose.resources.stringResource
@@ -49,8 +50,8 @@ fun LoginScreen(
     navController: NavController,
     loginViewModel: LoginViewModel,
 ){
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("test1@gmail.com") }
+    var password by remember { mutableStateOf("test1") }
 
 
     Surface(modifier = Modifier

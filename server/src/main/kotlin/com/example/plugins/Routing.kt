@@ -1,7 +1,10 @@
 package com.example.plugins
 
+import com.example.repository.PostgresTaskRepository
 import com.example.repository.UserRepository
+import com.example.routes.taskRoutes
 import com.example.routes.userRoutes
+import com.example.services.TaskService
 import com.example.services.UserService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
@@ -37,6 +40,10 @@ fun Application.configureRouting() {
         // Calls the userRoutes function to set up user-related routes, passing an instance of UserService
         // that depends on UserRepository for handling user data operations.
         userRoutes(UserService(UserRepository()))
+
+        // Calls the taskRoutes function to set up task-related routes, passing an instance of TaskService
+        // that depends on PostgresTaskRepository for handling task data operations.
+        taskRoutes(TaskService(PostgresTaskRepository()))
     }
 }
 

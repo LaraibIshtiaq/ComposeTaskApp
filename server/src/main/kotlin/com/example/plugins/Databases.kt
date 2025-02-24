@@ -1,5 +1,6 @@
 package com.example.plugins
 
+import com.example.db.tables.TaskTable
 import com.example.db.tables.UserTable
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -24,9 +25,10 @@ fun Application.configureDatabases() {
         user = "postgres",
         password = "password"
     )
-    //To create a table named "users" if not already exists
+    //To create a table named "users" and "task" if not already exists
     transaction {
         SchemaUtils.create(UserTable)
+        SchemaUtils.create(TaskTable)
     }
 
     TransactionManager.manager.defaultIsolationLevel =

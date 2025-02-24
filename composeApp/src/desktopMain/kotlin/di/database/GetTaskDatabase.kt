@@ -11,6 +11,7 @@ fun getTaskDatabase() : TaskDatabase {
     return Room.databaseBuilder<TaskDatabase>(
         name = dbFile.absolutePath
     )
+        .fallbackToDestructiveMigration(true)
         .setDriver(BundledSQLiteDriver())
         .build()
 }

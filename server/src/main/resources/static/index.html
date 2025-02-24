@@ -28,7 +28,6 @@ function deleteTask(name) {
 }
 
 function deleteTaskWithName(name) {
-    return sendDELETE(`/tasks/${name}`)
 }
 
 function addNewTask() {
@@ -57,15 +56,12 @@ function readTaskPriority() {
 }
 
 function fetchTasksWithPriority(priority) {
-    return sendGET(`/tasks/byPriority/${priority}`);
 }
 
 function fetchTaskWithName(name) {
-    return sendGET(`/tasks/byName/${name}`);
 }
 
 function fetchAllTasks() {
-    return sendGET("/tasks")
 }
 
 function sendGET(url) {

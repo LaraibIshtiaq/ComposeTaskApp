@@ -1,6 +1,5 @@
 package com.example.services
 
-import com.auth0.jwt.JWT
 import com.example.model.User
 import com.example.model.UserRequest
 import com.example.repository.UserRepository
@@ -8,7 +7,8 @@ import java.security.MessageDigest
 
 class UserService(private val userRepository: UserRepository) {
 
-    suspend fun createUser(userRequest: UserRequest): User {
+    fun createUser(userRequest: UserRequest): User {
+        println("UserService createUser called with userRequest: $userRequest")
         val existingUser = userRepository.findUserByEmail(userRequest.email)
         if (existingUser != null) {
             throw IllegalArgumentException("User with email ${userRequest.email} already exists")
@@ -18,10 +18,15 @@ class UserService(private val userRepository: UserRepository) {
         return user
     }
 
-    suspend fun loginUser(email: String, password: String): User {
+    fun loginUser(email: String, password: String): User {
+        println("UserService loginUser called with userRequest: $email $password")
         val hashedPassword = hashPassword(password)
-        val user = userRepository.signIn(email, hashedPassword)
+        val user: User = userRepository.signIn(email, hashedPassword)
             ?: throw IllegalArgumentException("Invalid credentials")
+        println("***********USER LOGGED IN************")
+        println(user.id)
+        println(user.name)
+        println(user.email) 
         return user
     }
 

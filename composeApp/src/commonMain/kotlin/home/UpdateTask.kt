@@ -97,13 +97,13 @@ fun UpdateTask(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        homeViewModel.upsertTask(
+                        homeViewModel.updateTask(
                             Task(
                                 task.id,
                                 taskName.value,
                                 taskDescription.value,
                                 taskPriority.value,
-                                1,
+                                task.userId,
                             ))
                         shouldShowDialog.value = false
                     }

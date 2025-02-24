@@ -5,6 +5,7 @@ import auth.login.LoginViewModel
 import auth.signup.SignUpViewModel
 import data.NetworkService
 import home.HomeViewModel
+import home.TaskRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -13,12 +14,13 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.compose.viewmodel.dsl.viewModelOf
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
 val sharedModule = module {
-    viewModelOf(::LoginViewModel)
+    viewModel { LoginViewModel(get(), get()) }
     viewModelOf(::SignUpViewModel)
     viewModelOf(::HomeViewModel)
     single{
@@ -27,6 +29,9 @@ val sharedModule = module {
 
     single {
         AuthRepository(get(), get())
+    }
+    single {
+        TaskRepository(get(), get())
     }
     single{
         HttpClient(CIO) {

@@ -11,6 +11,7 @@ fun getTaskDatabase(context: Context): TaskDatabase{
         context= context.applicationContext,
         name= dbFile.absolutePath
     )
+        .fallbackToDestructiveMigration(true)
         .setDriver(BundledSQLiteDriver())
         .build()
 }

@@ -23,7 +23,9 @@ fun getTaskDatabase(): TaskDatabase {
     val dbFilePath = documentDirectory() + "/task.db"
     return Room.databaseBuilder<TaskDatabase>(
         name = dbFilePath,
-    ).setDriver(BundledSQLiteDriver())
+    )
+        .fallbackToDestructiveMigration(true)
+        .setDriver(BundledSQLiteDriver())
         .build()
 }
 

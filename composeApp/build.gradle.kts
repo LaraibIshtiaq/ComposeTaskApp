@@ -74,6 +74,9 @@ kotlin {
 
             //Dependencies for splash screen
             implementation(libs.core.splashscreen)
+
+            //Dependency for Logging
+            implementation("co.touchlab:kermit:2.0.4")
         }
 
         nativeMain.dependencies {

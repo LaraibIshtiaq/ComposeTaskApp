@@ -6,12 +6,15 @@ import com.example.model.UserRequest
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class UserRepository {
-    suspend fun findUserByEmail(email: String): User? = transaction {
+    fun findUserByEmail(email: String): User? = transaction {
+        println("UserRepository findUserByEmail called with user: $email")
+
         //select * from users where email = email
-        UserTable.select { UserTable.email eq email }.map {
+        UserTable.selectAll().where { UserTable.email eq email }.map {
             User(
                 it[UserTable.name],
                 it[UserTable.email],
@@ -20,7 +23,8 @@ class UserRepository {
         }.singleOrNull()
     }
 
-    suspend fun createUser(user: UserRequest): User = transaction {
+    fun createUser(user: UserRequest): User = transaction {
+        println("UserRepository createUser called with user: $user")
         val id = UserTable.insert {
             it[name] = user.name
             it[email] = user.email
@@ -29,13 +33,13 @@ class UserRepository {
         User(user.name, user.email, id)
     }
 
-    suspend fun signIn(email: String, password: String): User? = transaction {
+    fun signIn(email: String, password: String): User = transaction {
         UserTable.select { UserTable.email eq email and (UserTable.password eq password) }.map {
             User(
                 it[UserTable.name],
                 it[UserTable.email],
                 it[UserTable.id]
             )
-        }.singleOrNull()
+        }.first()
     }
 }

@@ -1,5 +1,7 @@
 package data
 
+import co.touchlab.kermit.Logger
+import data.model.Task
 import data.model.request.LoginRequest
 import data.model.request.SignupRequest
 import data.model.response.RegisterResponse
@@ -40,6 +42,46 @@ class NetworkService(val httpClient: HttpClient) {
         )
     }
 
+
+    // Registers a user by sending a POST request with the signup request body to the backend.
+    suspend fun addTasks(task: Task): ResultWrapper<Task> {
+        // Calls the makeWebRequest method to send the request and returns the result
+        Logger.w("LogTASKs"){"Network service 2"};
+        return makeWebRequest<Task>(
+            "$baseURL/task/create",
+            HttpMethod.Post,
+            body = task
+        )
+    }
+
+    // Updates an existing task by sending a PUT request with the updated task details
+    suspend fun updateTask(task: Task): ResultWrapper<Task> {
+        return makeWebRequest<Task>(
+            "$baseURL/task/update",
+            HttpMethod.Put,
+            body = task
+        )
+    }
+
+    // Deletes a task by sending a DELETE request with the task ID as a query parameter
+    suspend fun deleteTask(taskId: Int): ResultWrapper<Boolean> {
+        return makeWebRequest<Boolean>(
+            "$baseURL/task/delete?id=$taskId",
+            HttpMethod.Delete
+        )
+    }
+
+
+    //get the tasks for user id passed in parameter
+    suspend fun getTasksForUser(userId: Int): ResultWrapper<List<Task>> {
+        return makeWebRequest<List<Task>>(
+            "$baseURL/task/all?userId=$userId",
+            HttpMethod.Get
+        )
+    }
+
+
+
     // A generic function to make HTTP requests to any URL with the specified HTTP method and body.
     // It can handle any response type T.
     suspend inline fun <reified T> makeWebRequest(
@@ -51,6 +93,8 @@ class NetworkService(val httpClient: HttpClient) {
     ): ResultWrapper<T> {
         return try {
 
+            println("Requesting url $url")
+            println("Requesting method $method")
             // Send the HTTP request using the provided parameters and body
             val response = httpClient.request(url) {
                 this.method = method
@@ -65,8 +109,13 @@ class NetworkService(val httpClient: HttpClient) {
                 }
                 // Specify content type as JSON
                 contentType(ContentType.Application.Json)
-            }.body<T>()// Deserialize the response body into the specified type T
-            ResultWrapper.Success(response)
+            }
+            println("Response received: ${response.status}")
+
+            val responseBody = response.body<T>()
+            println("Parsed response: $responseBody")
+
+            ResultWrapper.Success(responseBody)
         } catch (e: ClientRequestException) {
             // Catch any client-side errors (e.g., network issues, malformed requests)
             ResultWrapper.Error(Exception("Network Issues"))  // Return an error result with the exception

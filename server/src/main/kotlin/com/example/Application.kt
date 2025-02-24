@@ -1,9 +1,9 @@
 package com.example
 
-import com.example.repository.PostgresTaskRepository
 import com.example.plugins.configureDatabases
 import com.example.plugins.configureRouting
 import com.example.plugins.configureSerialization
+import com.example.repository.PostgresTaskRepository
 import io.ktor.server.application.Application
 
 // Main function entry point for the Ktor application.

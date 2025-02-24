@@ -23,6 +23,7 @@ import data.model.Priority
 import data.model.Task
 import org.jetbrains.compose.resources.stringResource
 import theme.SmallSpacing
+import kotlin.random.Random
 
 @Composable
 fun AddNewTask(
@@ -93,14 +94,15 @@ fun AddNewTask(
             confirmButton = {
                 TextButton(
                     onClick = {
+                        ///Attach userId automatically instead of like this
                         homeViewModel.upsertTask(
                             Task(
-                                0,
+                                Random.nextInt(1, Int.MAX_VALUE),
                                 taskName.value,
                                 taskDescription.value,
-                                taskPriority.value)
+                                taskPriority.value,
+                                2)
                         )
-                        homeViewModel.shouldShowDialog.value = false
                               },
                     ) {
                     Text(stringResource(Res.string.add_task))

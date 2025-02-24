@@ -5,10 +5,10 @@ import com.example.model.UserRequest
 import com.example.services.UserService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
+import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import io.ktor.server.response.respond
 
 fun Route.userRoutes(userService: UserService) {
     route("/users") {
