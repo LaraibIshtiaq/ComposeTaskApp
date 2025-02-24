@@ -14,8 +14,6 @@ import kotlinx.coroutines.launch
 
 // ViewModel class for handling user login logic and managing UI state.
 class LoginViewModel(
-    private var homeViewModel: HomeViewModel,
-
     private val authRepository: AuthRepository): ViewModel() {
     // Backing property for the login state, initialized with Nothing as the default state.
     private val _uiState = MutableStateFlow<LoginState>(LoginState.Nothing)
@@ -23,7 +21,7 @@ class LoginViewModel(
     val uiState = _uiState.asStateFlow()
 
     // Initiates the login process by calling the network service and updating the UI state.
-    fun login(email: String, password: String) {
+    fun login(email: String, password: String, homeViewModel: HomeViewModel) {
         // Sets the UI state to Loading to indicate login is in progress.
         _uiState.value = LoginState.Loading
 

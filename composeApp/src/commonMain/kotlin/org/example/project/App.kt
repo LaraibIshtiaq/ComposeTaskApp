@@ -41,6 +41,7 @@ fun App() {
                     SignUpScreen(
                         navController,
                         signUpViewModel,
+                        homeViewModel
                     )
                 }
 
@@ -48,6 +49,7 @@ fun App() {
                     LoginScreen(
                         navController,
                         loginViewModel,
+                        homeViewModel
                     )
                 }
 

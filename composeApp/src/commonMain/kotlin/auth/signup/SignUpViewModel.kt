@@ -6,6 +6,7 @@ import auth.AuthRepository
 import data.NetworkService
 import data.ResultWrapper
 import data.model.request.SignupRequest
+import home.HomeViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -19,7 +20,7 @@ class SignUpViewModel(private val authRepository: AuthRepository): ViewModel() {
     val uiState = _uiState.asStateFlow()
 
     // Registers a new user by calling the network service and updates the UI state accordingly.
-    fun register(name: String, email: String, password: String) {
+    fun register(name: String, email: String, password: String, homeViewModel: HomeViewModel) {
         // Sets the UI state to Loading to indicate sign-up is in progress.
         _uiState.value = SignupState.Loading
         // Launches a coroutine in the ViewModel's scope to handle asynchronous registration.
@@ -27,7 +28,10 @@ class SignUpViewModel(private val authRepository: AuthRepository): ViewModel() {
             // Makes a request to register the user, passing the necessary sign-up details
             authRepository.registerUser(name, email, password).collect { response ->
                 when (response) {
-                    is ResultWrapper.Success -> _uiState.value = SignupState.Success
+                    is ResultWrapper.Success -> {
+                        homeViewModel.setUserId(response.value.id)
+                        _uiState.value = SignupState.Success
+                    }
                     is ResultWrapper.Error -> _uiState.value =
                         SignupState.Error(response.e.message ?: "An error occurred")
                 }

@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class RegisterResponse(val name: String, val email: String, val id: Int) {
     fun toUserEntity(): User {
         return User(
-            id.toLong(),
+            id,
             name,
             email
         )

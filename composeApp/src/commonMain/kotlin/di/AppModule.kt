@@ -20,7 +20,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 val sharedModule = module {
-    viewModel { LoginViewModel(get(), get()) }
+    viewModel { LoginViewModel(get()) }
     viewModelOf(::SignUpViewModel)
     viewModelOf(::HomeViewModel)
     single{

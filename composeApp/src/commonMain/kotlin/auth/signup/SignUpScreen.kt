@@ -36,6 +36,7 @@ import composetaskapp.composeapp.generated.resources.enter_password
 import composetaskapp.composeapp.generated.resources.enter_user_name
 import composetaskapp.composeapp.generated.resources.login
 import composetaskapp.composeapp.generated.resources.signup
+import home.HomeViewModel
 import navigation.NavRoutes
 import org.jetbrains.compose.resources.stringResource
 import theme.ButtonHeight
@@ -48,6 +49,7 @@ import theme.SmallSpacing
 fun SignUpScreen(
     navController: NavController,
     signUpViewModel: SignUpViewModel,
+    homeViewModel: HomeViewModel
 ){
 
     Surface(modifier = Modifier
@@ -167,7 +169,7 @@ fun SignUpScreen(
                     Button(
                         enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty(),
                         onClick = {
-                            signUpViewModel.register(name, email, password)
+                            signUpViewModel.register(name, email, password, homeViewModel = homeViewModel)
                         },
                         modifier = Modifier
                             .fillMaxWidth()

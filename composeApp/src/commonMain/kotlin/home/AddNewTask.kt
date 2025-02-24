@@ -95,14 +95,17 @@ fun AddNewTask(
                 TextButton(
                     onClick = {
                         ///Attach userId automatically instead of like this
-                        homeViewModel.upsertTask(
-                            Task(
-                                Random.nextInt(1, Int.MAX_VALUE),
-                                taskName.value,
-                                taskDescription.value,
-                                taskPriority.value,
-                                2)
-                        )
+                        if(homeViewModel.userId.value != null){
+                            homeViewModel.addTask(
+                                Task(
+                                    Random.nextInt(1, Int.MAX_VALUE),
+                                    taskName.value,
+                                    taskDescription.value,
+                                    taskPriority.value,
+                                    homeViewModel.userId.value!!
+                                )
+                            )
+                        }
                               },
                     ) {
                     Text(stringResource(Res.string.add_task))

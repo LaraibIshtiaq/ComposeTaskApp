@@ -49,6 +49,7 @@ import theme.SmallSpacing
 fun LoginScreen(
     navController: NavController,
     loginViewModel: LoginViewModel,
+    homeViewModel: HomeViewModel
 ){
     var email by remember { mutableStateOf("test1@gmail.com") }
     var password by remember { mutableStateOf("test1") }
@@ -163,7 +164,7 @@ fun LoginScreen(
                     Button(
                         enabled = email.isNotEmpty() && password.isNotEmpty(),
                         onClick = {
-                            loginViewModel.login(email = email, password = password)
+                            loginViewModel.login(email = email, password = password, homeViewModel)
                         },
                         modifier = Modifier
                             .fillMaxWidth()

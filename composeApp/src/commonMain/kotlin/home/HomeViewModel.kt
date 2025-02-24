@@ -9,15 +9,12 @@ import database.TaskDao
 import kotlinx.coroutines.launch
 import data.model.Priority
 import data.model.Task
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 
-class HomeViewModel(private val taskRepository: TaskRepository,
+class HomeViewModel(
+    private val taskRepository: TaskRepository,
+
     // Pass in the DAO as needed for saving/retrieving from the local database
     private val taskDao: TaskDao
-
 ): ViewModel() {
     val priorities: List<Priority> = Priority.entries
 
@@ -36,6 +33,7 @@ class HomeViewModel(private val taskRepository: TaskRepository,
         loadTasks()
     }
 
+
     private fun updateTasks(newTasks: List<Task>) {
         tasks.value = tasks.value.toMutableList().apply {
             newTasks.forEach { newTask ->
@@ -51,13 +49,17 @@ class HomeViewModel(private val taskRepository: TaskRepository,
         }
     }
 
+    private fun replaceTask(newTaskList: List<Task>){
+        tasks.value = newTaskList
+    }
+
     // Function to load tasks from the database
-    private fun loadTasks() {
+    fun loadTasks() {
         viewModelScope.launch {
             _userId.value?.let { id ->
                 taskRepository.getTasksByUserId(id).collect { taskList ->
                     Logger.w("LogTASKs") { "Loaded Tasks: $taskList" }
-                    updateTasks(taskList)
+                    replaceTask(taskList)
                 }
                 hideAddTaskDialog()
             }
@@ -76,11 +78,10 @@ class HomeViewModel(private val taskRepository: TaskRepository,
         _shouldShowDialog.value = false
     }
 
-    // Adds or updates a task in the database
-    fun upsertTask(task: Task) {
+    // Adds a task in the database
+    fun addTask(task: Task) {
         Logger.w("LogTASKs") { "upsert task called" }
         viewModelScope.launch {
-
             taskRepository.createTask(task).collect { newTask ->
                 Logger.w("LogTASKs") { "Fetched tasks create: $newTask" }
                 updateTasks(listOf(newTask))

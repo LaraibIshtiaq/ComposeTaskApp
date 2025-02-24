@@ -22,7 +22,7 @@ data class Task(
     val title: String,
     val description: String,
     val priority: Priority,
-    val userId: Long // Foreign key referring to User table
+    val userId: Int // Foreign key referring to User table
 )
 
 //enum to represent priorities
