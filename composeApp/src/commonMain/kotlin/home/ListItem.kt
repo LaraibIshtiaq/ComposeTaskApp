@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -35,10 +36,10 @@ import org.jetbrains.compose.resources.painterResource
 fun ListItem(
     homeViewModel: HomeViewModel,
     itemNumber: Int,
-    task: Task,
-    onDetailView: () -> Unit){
+    task: Task){
 
     var shouldShowUpdateDialog = remember { mutableStateOf(false) }
+    var shouldShowDetailDialog = remember { mutableStateOf(false) }
 
     if (shouldShowUpdateDialog.value) {
         UpdateTask(
@@ -48,9 +49,23 @@ fun ListItem(
         )
     }
 
+    if (shouldShowDetailDialog.value) {
+        AlertDialog(
+            onDismissRequest = { shouldShowDetailDialog.value = false },
+            title = { Text("Task Details") },
+            text = { Text("Title: ${task.title}\nDescription: ${task.description}") },
+            confirmButton = {
+                Text(
+                    "OK",
+                    modifier = Modifier.clickable { shouldShowDetailDialog.value = false }
+                )
+            }
+        )
+    }
+
     Card(
         onClick = {
-            onDetailView()
+            shouldShowDetailDialog.value = true
         },
     ){
         Row(
@@ -95,7 +110,9 @@ fun ListItem(
                 )
             }
 
-            Column {
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
                 Text(
                     "${task.priority}",
                     style = MaterialTheme.typography.body1,

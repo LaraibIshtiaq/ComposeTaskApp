@@ -1,6 +1,5 @@
 package auth
 
-import auth.login.LoginState
 import data.NetworkService
 import data.ResultWrapper
 import data.model.request.LoginRequest

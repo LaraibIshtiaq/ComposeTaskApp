@@ -5,114 +5,127 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import database.TaskDao
 import kotlinx.coroutines.launch
 import data.model.Priority
 import data.model.Task
 
 class HomeViewModel(
-    private val taskRepository: TaskRepository,
+    private val taskRepository: TaskRepository
+) : ViewModel() {
 
-    // Pass in the DAO as needed for saving/retrieving from the local database
-    private val taskDao: TaskDao
-): ViewModel() {
+    // Centralized log tag
+    private val logTag = "HomeViewModel"
+
+    /** List of available priorities for tasks */
     val priorities: List<Priority> = Priority.entries
 
-    // Holds the visibility state of the dialog
-    private val _shouldShowDialog = mutableStateOf(false)
-    val shouldShowDialog: MutableState<Boolean> get() = _shouldShowDialog
+    /** Controls the visibility of the Add Task dialog */
+    val isAddTaskDialogVisible = mutableStateOf(false)
 
+    /** Holds the current user ID */
     private val _userId: MutableState<Int?> = mutableStateOf(null)
     val userId: MutableState<Int?> get() = _userId
 
-    var tasks : MutableState<List<Task>> = mutableStateOf(listOf())
+    /** Stores the list of tasks for the user */
+    val tasks: MutableState<List<Task>> = mutableStateOf(emptyList())
 
+    /**
+     * Sets the user ID and loads tasks for the specified user.
+     */
     fun setUserId(id: Int) {
-        Logger.w("LogTASKs") { "setUserId called with ID: $id" }
+        Logger.w(logTag) { "Setting userId: $id" }
         _userId.value = id
         loadTasks()
     }
 
-
-    private fun updateTasks(newTasks: List<Task>) {
-        tasks.value = tasks.value.toMutableList().apply {
-            newTasks.forEach { newTask ->
-                val existingIndex = indexOfFirst { it.id == newTask.id }
-                if (existingIndex != -1) {
-                    // Replace existing task
-                    set(existingIndex, newTask)
-                } else {
-                    // Add new task
-                    add(newTask)
-                }
-            }
-        }
+    /**
+     * Replaces the existing task list with a new list.
+     */
+    private fun replaceTasks(newTasks: List<Task>) {
+        tasks.value = newTasks
     }
 
-    private fun replaceTask(newTaskList: List<Task>){
-        tasks.value = newTaskList
-    }
-
-    // Function to load tasks from the database
+    /**
+     * Fetches tasks for the current user from the repository.
+     */
     fun loadTasks() {
         viewModelScope.launch {
             _userId.value?.let { id ->
-                taskRepository.getTasksByUserId(id).collect { taskList ->
-                    Logger.w("LogTASKs") { "Loaded Tasks: $taskList" }
-                    replaceTask(taskList)
+                try {
+                    taskRepository.getTasksByUserId(id).collect { taskList ->
+                        Logger.w(logTag) { "Loaded Tasks: $taskList" }
+                        replaceTasks(taskList)
+                    }
+                } catch (e: Exception) {
+                    Logger.e(logTag) { "Error loading tasks: $e" }
+                }
+            } ?: Logger.w(logTag) { "User ID is null, skipping task loading" }
+        }
+    }
+
+    /**
+     * Displays the Add Task dialog.
+     */
+    fun showAddTaskDialog() {
+        isAddTaskDialogVisible.value = true
+    }
+
+    /**
+     * Hides the Add Task dialog.
+     */
+    fun hideAddTaskDialog() {
+        isAddTaskDialogVisible.value = false
+    }
+
+    /**
+     * Adds a new task to the database and updates the task list.
+     */
+    fun addTask(task: Task) {
+        Logger.w(logTag) { "Adding task: $task" }
+        viewModelScope.launch {
+            try {
+                taskRepository.createTask(task).collect { newTask ->
+                    Logger.w(logTag) { "Task created: $newTask" }
+                    tasks.value += newTask
                 }
                 hideAddTaskDialog()
+            } catch (e: Exception) {
+                Logger.e(logTag) { "Error adding task: $e" }
             }
-            Logger.w("LogTASKs") { "user id $_userId" }
         }
     }
 
-
-    //Show dialog for adding tasks
-    fun showAddTaskDialog() {
-        _shouldShowDialog.value = true
-    }
-
-    //Hide dialog for adding tasks
-    private fun hideAddTaskDialog() {
-        _shouldShowDialog.value = false
-    }
-
-    // Adds a task in the database
-    fun addTask(task: Task) {
-        Logger.w("LogTASKs") { "upsert task called" }
-        viewModelScope.launch {
-            taskRepository.createTask(task).collect { newTask ->
-                Logger.w("LogTASKs") { "Fetched tasks create: $newTask" }
-                updateTasks(listOf(newTask))
-            }
-            //hide the task dialog
-            hideAddTaskDialog()
-        }
-    }
-
-    //Updates a task in the database
+    /**
+     * Updates an existing task in the database.
+     */
     fun updateTask(task: Task) {
-        Logger.w("LogTASKs") { "update task called" }
+        Logger.w(logTag) { "Updating task: $task" }
         viewModelScope.launch {
-            taskRepository.updateTask(task).collect { newTask ->
-                Logger.w("LogTASKs") { "Fetched tasks update: $newTask" }
-                updateTasks(listOf(newTask))
+            try {
+                taskRepository.updateTask(task).collect { updatedTask ->
+                    Logger.w(logTag) { "Task updated: $updatedTask" }
+                    tasks.value = tasks.value.map { if (it.id == updatedTask.id) updatedTask else it }
+                }
+                hideAddTaskDialog()
+            } catch (e: Exception) {
+                Logger.e(logTag) { "Error updating task: $e" }
             }
-            //hide the task dialog
-            hideAddTaskDialog()
         }
     }
 
-    // Deletes a task
+    /**
+     * Deletes a task from the database and removes it from the task list.
+     */
     fun deleteTask(task: Task) {
+        Logger.w(logTag) { "Deleting task: ${task.id}" }
         viewModelScope.launch {
-            taskRepository.deleteTask(task).collect { newTask ->
-                Logger.w("LogTASKs") { "Task Deleted: $newTask" }
-                taskDao.deleteTask(task)
-
-                // Remove the deleted task from the list
-                tasks.value = tasks.value.filterNot { it.id == task.id }
+            try {
+                taskRepository.deleteTask(task).collect {
+                    tasks.value = tasks.value.filterNot { it.id == task.id }
+                    Logger.w(logTag) { "Task deleted: ${task.id}" }
+                }
+            } catch (e: Exception) {
+                Logger.e(logTag) { "Error deleting task: $e" }
             }
         }
     }

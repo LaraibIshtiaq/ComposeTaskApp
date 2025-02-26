@@ -1,15 +1,9 @@
 package home
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -17,73 +11,78 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
 import composetaskapp.composeapp.generated.resources.Res
 import composetaskapp.composeapp.generated.resources.add_task
 import composetaskapp.composeapp.generated.resources.no_tasks
+import data.model.Task
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun HomePage(homeViewModel: HomeViewModel){
-
+fun HomePage(homeViewModel: HomeViewModel) {
     Column(
-        Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.End) {
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.End
+    ) {
         AppBarUi(homeViewModel = homeViewModel)
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colors.background)
-            .padding(20.dp)) {
-            BodyContent(homeViewModel= homeViewModel)
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colors.background)
+                .padding(20.dp)
+        ) {
+            BodyContent(homeViewModel)
         }
     }
 }
 
-
 @Composable
 fun BodyContent(homeViewModel: HomeViewModel) {
-    val task = homeViewModel.tasks.value
+    val tasks = homeViewModel.tasks.value
 
-    Logger.w("LogTASKs") { "Tasks list updated in HOMESCREEN $task" }
-
-    if (homeViewModel.shouldShowDialog.value) {
-        AddNewTask(
-            homeViewModel,
-        )
+    if (homeViewModel.isAddTaskDialogVisible.value) {
+        AddNewTask(homeViewModel)
     }
 
-
-    //Add tasks Button
-    Button(
-        onClick = {
-            homeViewModel.showAddTaskDialog()
-        },
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(stringResource(Res.string.add_task),
-            style = MaterialTheme.typography.button)
-    }
+        AddTaskButton { homeViewModel.showAddTaskDialog() }
 
-    ///If tasks list is empty then show No Tasks present
-    if(task.isEmpty())
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(stringResource(Res.string.no_tasks), style = MaterialTheme.typography.h4)
+        if (tasks.isEmpty()) {
+            NoTasksMessage()
+        } else {
+            TaskList(tasks, homeViewModel)
         }
-    else
+    }
+}
+
+@Composable
+fun AddTaskButton(onClick: () -> Unit) {
+    Button(onClick = onClick) {
+        Text(stringResource(Res.string.add_task), style = MaterialTheme.typography.button)
+    }
+}
+
+@Composable
+fun NoTasksMessage() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(stringResource(Res.string.no_tasks), style = MaterialTheme.typography.h4)
+    }
+}
+
+@Composable
+fun TaskList(tasks: List<Task>, homeViewModel: HomeViewModel) {
     LazyColumn(
-        modifier = Modifier.padding(0.dp, 60.dp, 0.dp, 0.dp),
+        modifier = Modifier.padding(top = 60.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        items(task) { task ->  // Use task.id for proper recomposition
-            ListItem(
-                homeViewModel,
-                task.id,
-                task,
-                onDetailView = { }
-            )
+        itemsIndexed(tasks) { index, task ->
+            ListItem(homeViewModel, index + 1, task)
         }
     }
 }

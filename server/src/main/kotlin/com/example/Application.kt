@@ -14,11 +14,8 @@ fun main(args: Array<String>) {
 
 // Ktor Application module, serving as the main configuration setup for the server.
 fun Application.module() {
-    // Creates an instance of PostgresTaskRepository to handle task-related database operations.
-    val postgresRepository = PostgresTaskRepository()
-
     // Configures serialization for handling JSON or other formats using the repository.
-    configureSerialization(postgresRepository)
+    configureSerialization()
 
     // Sets up database configurations (e.g., initializing the connection).
     configureDatabases()

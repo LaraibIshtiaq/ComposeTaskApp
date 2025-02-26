@@ -13,10 +13,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 // ViewModel class for handling user login logic and managing UI state.
-class LoginViewModel(
-    private val authRepository: AuthRepository): ViewModel() {
-    // Backing property for the login state, initialized with Nothing as the default state.
+class LoginViewModel(private val authRepository: AuthRepository): ViewModel() {
+
+    // Backing property for the login state,
+    // initialized with Nothing as the default state.
     private val _uiState = MutableStateFlow<LoginState>(LoginState.Nothing)
+
     // Publicly exposed read-only view of the login state.
     val uiState = _uiState.asStateFlow()
 
@@ -43,12 +45,6 @@ class LoginViewModel(
                 }
             }
         }
-    }
-
-    // Saves the user's data locally after a successful login.
-    private fun saveUser(userId: Int) {
-        // Implementation for saving the user data locally will go here.
-
     }
 
     // Resets the UI state to Nothing, allowing for retry attempts if needed.

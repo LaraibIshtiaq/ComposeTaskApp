@@ -4,35 +4,41 @@ import com.example.model.User
 import com.example.model.UserRequest
 import com.example.repository.UserRepository
 import java.security.MessageDigest
+import java.util.logging.Logger
 
 class UserService(private val userRepository: UserRepository) {
 
+    private val logger: Logger = Logger.getLogger(UserService::class.java.name)
+
     fun createUser(userRequest: UserRequest): User {
-        println("UserService createUser called with userRequest: $userRequest")
-        val existingUser = userRepository.findUserByEmail(userRequest.email)
-        if (existingUser != null) {
+        logger.info("Creating user with email: ${userRequest.email}")
+
+        require(userRequest.email.isNotBlank()) { "Email cannot be blank" }
+        require(userRequest.password.isNotBlank()) { "Password cannot be blank" }
+
+        userRepository.findUserByEmail(userRequest.email)?.let {
             throw IllegalArgumentException("User with email ${userRequest.email} already exists")
         }
-        val user =
-            userRepository.createUser(userRequest.copy(password = hashPassword(userRequest.password)))
-        return user
+
+        return userRepository.createUser(
+            userRequest.copy(password = hashPassword(userRequest.password))
+        ).also {
+            logger.info("User created successfully with ID: ${it.id}")
+        }
     }
 
     fun loginUser(email: String, password: String): User {
-        println("UserService loginUser called with userRequest: $email $password")
+        logger.info("Attempting login for email: $email")
+
         val hashedPassword = hashPassword(password)
-        val user: User = userRepository.signIn(email, hashedPassword)
-            ?: throw IllegalArgumentException("Invalid credentials")
-        println("***********USER LOGGED IN************")
-        println(user.id)
-        println(user.name)
-        println(user.email) 
-        return user
+        return userRepository.signIn(email, hashedPassword)
     }
 
-    fun hashPassword(password: String): String {
-        val md = MessageDigest.getInstance("SHA-256")
-        return md.digest(password.toByteArray())
-            .fold("") { str, it -> str + "%02x".format(it) }
+    companion object {
+        fun hashPassword(password: String): String {
+            return MessageDigest.getInstance("SHA-256")
+                .digest(password.toByteArray())
+                .joinToString("") { "%02x".format(it) }
+        }
     }
 }

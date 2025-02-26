@@ -6,88 +6,93 @@ import data.ResultWrapper
 import data.model.Task
 import database.TaskDao
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 
+// Task repository responsible for calling data from network service or DB
 class TaskRepository(
     private val networkService: NetworkService,
-    // Pass in the DAO as needed for saving/retrieving from the local database
     private val taskDao: TaskDao
 ) {
+    private val logTag = "TaskRepository"
 
     suspend fun getTasksByUserId(userId: Int): Flow<List<Task>> = flow {
-        val result = networkService.getTasksForUser(userId)
-        Logger.w("LogTASKs") { "RESULT FROM NETWORK: $result" }
+        Logger.w { "$logTag: Fetching tasks for user $userId" }
 
-        when (result) {
+        when (val result = networkService.getTasksForUser(userId)) {
             is ResultWrapper.Success -> {
-                Logger.w("LogTASKs") { "Updating DB with fresh tasks: ${result.value}" }
-                result.value.forEach { taskDao.upsertTask(it) }
+                Logger.w { "$logTag: Fetched ${result.value.size} tasks from network, updating local DB" }
+                result.value.forEach { task ->
+                    taskDao.upsertTask(task)
+                }
                 emit(result.value)
             }
             is ResultWrapper.Error -> {
-                Logger.w("LogTASKs") { "Network error: $result" }
+                Logger.e { "$logTag: Failed to fetch tasks: $result" }
+                emit(emptyList()) // Emit an empty list on error to avoid unhandled cases
             }
         }
     }
 
-    // Function to register a user. Checks network response and saves to local storage if successful.
     suspend fun createTask(task: Task): Flow<Task> = flow {
-        // Send the network request to register the user
-        // Emit the response to ViewModel, handling success or error
-        Logger.w("LogTASKs"){"creating Tasks TaskRepo"}
-        when (val response = networkService.addTasks(task)) {
-            is ResultWrapper.Success -> {
-                println(response.value)
-                saveTaskLocally(response.value)
-                emit(response.value)
-            }
-            is ResultWrapper.Error -> {
-                Logger.w("LogTASKs"){"ERROR in TaskRepo for create Task"}
-                println(response)
-            }
-        }
+        Logger.w { "$logTag: Creating task: $task" }
+        handleNetworkResult(
+            call = { networkService.addTask(task) },
+            onSuccess = { saveTaskLocally(it) },
+            onError = { Logger.e { "$logTag: Failed to create task: $it" } }
+        )?.let { emit(it) }
     }
 
     suspend fun updateTask(task: Task): Flow<Task> = flow {
-        Logger.w("LogTASKs") { "Updating task in TaskRepo: $task" }
-
-        when (val response = networkService.updateTask(task)) {
-            is ResultWrapper.Success -> {
-                saveTaskLocally(response.value) // Save updated task in local DB
-                emit(response.value) // Emit updated task
-            }
-            is ResultWrapper.Error -> {
-                Logger.w("LogTASKs") { "ERROR in TaskRepo for update Task" }
-            }
-        }
+        Logger.w { "$logTag: Updating task: $task" }
+        handleNetworkResult(
+            call = { networkService.updateTask(task) },
+            onSuccess = { saveTaskLocally(it) },
+            onError = { Logger.e { "$logTag: Failed to update task: $it" } }
+        )?.let { emit(it) }
     }
-
 
     suspend fun deleteTask(task: Task): Flow<Boolean> = flow {
-        Logger.w("LogTASKs") { "Deleting task with ID: ${task.id}" }
+        Logger.w { "$logTag: Deleting task with ID: ${task.id}" }
+        handleNetworkResult(
+            call = { networkService.deleteTask(task.id) },
+            onSuccess = {
+                removeTaskLocally(task)
+                emit(true)
+            },
+            onError = {
+                Logger.e { "$logTag: Failed to delete task: $it" }
+                emit(false)
+            }
+        )
+    }
 
-        when (val response = networkService.deleteTask(task.id)) {
+    // Handles common network call logic to avoid repetition
+    private suspend fun <T> handleNetworkResult(
+        call: suspend () -> ResultWrapper<T>,
+        onSuccess: suspend (T) -> Unit,
+        onError: suspend (ResultWrapper.Error) -> Unit
+    ): T? {
+        return when (val response = call()) {
             is ResultWrapper.Success -> {
-                removeTaskLocally(task) // Delete task from local DB
-                emit(true) // Emit success status
+                onSuccess(response.value)
+                response.value
             }
             is ResultWrapper.Error -> {
-                Logger.w("LogTASKs") { "ERROR in TaskRepo for delete Task" }
-                emit(false) // Emit failure status
+                onError(response)
+                null
             }
         }
     }
 
-    // Removes task from the local Room database
-    private suspend fun removeTaskLocally(task: Task) {
-        Logger.w("LogTASKs") { "Deleting task locally with ID: ${task.id}" }
-        taskDao.deleteTask(task)
+    // Saves multiple tasks to local DB
+    private suspend fun saveTaskLocally(task: Task) {
+        Logger.w { "$logTag: Saving task locally: ${task.id}" }
+        taskDao.upsertTask(task)
     }
 
-                                          // Saves user data locally in the Room database
-    private suspend fun saveTaskLocally(task: Task) {
-        Logger.w("LogTASKs"){"saving tasks locally"}
-        taskDao.upsertTask(task)
+    // Deletes task from local DB
+    private suspend fun removeTaskLocally(task: Task) {
+        Logger.w { "$logTag: Removing task locally: ${task.id}" }
+        taskDao.deleteTask(task)
     }
 }

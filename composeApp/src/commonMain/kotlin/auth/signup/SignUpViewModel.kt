@@ -16,6 +16,7 @@ class SignUpViewModel(private val authRepository: AuthRepository): ViewModel() {
 
     // Backing property for the sign-up state, initialized with Nothing as the default state.
     private val _uiState = MutableStateFlow<SignupState>(SignupState.Nothing)
+
     // Publicly exposed read-only view of the sign-up state.
     val uiState = _uiState.asStateFlow()
 
@@ -37,11 +38,6 @@ class SignUpViewModel(private val authRepository: AuthRepository): ViewModel() {
                 }
             }
         }
-    }
-
-    // Saves the user's data locally in the Room database after successful server response.
-    private fun saveUserLocally() {
-        // Implementation for saving the user data locally will go here.
     }
 
     // Resets the UI state to Nothing, allowing for retry attempts if needed.

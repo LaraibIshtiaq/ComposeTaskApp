@@ -36,7 +36,7 @@ fun AddNewTask(
     val taskPriority = remember { mutableStateOf(Priority.Low) }
     val textLength = remember { mutableStateOf(0) }
 
-    if(homeViewModel.shouldShowDialog.value){
+    if(homeViewModel.isAddTaskDialogVisible.value){
         AlertDialog(
             title = {
                 Text(text =  stringResource(Res.string.add_task))
@@ -88,7 +88,7 @@ fun AddNewTask(
             },
 
             onDismissRequest = {
-                homeViewModel.shouldShowDialog.value = false
+                homeViewModel.hideAddTaskDialog()
             },
 
             confirmButton = {
@@ -115,7 +115,7 @@ fun AddNewTask(
             dismissButton = {
                 TextButton(
                     onClick = {
-                        homeViewModel.shouldShowDialog.value = false
+                        homeViewModel.hideAddTaskDialog()
                     }
                 ) {
                     Text(text = stringResource(Res.string.cancel))
